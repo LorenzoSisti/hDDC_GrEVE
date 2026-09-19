@@ -50,12 +50,12 @@ from MDAnalysis.analysis import distances
 # ========================================================================
 
 # --- Sistema Apo / Open --------------------------------------------------
-APO_TOPOLOGY = "apo.pdb"          # file di topologia (pdb, psf, prmtop, gro, ...)
-APO_TRAJECTORY = "apo_concat.xtc"  # traiettoria concatenata, gia' senza acqua
+APO_TOPOLOGY = "/Users/lorenzosisti/hDDC_GrEVE/invisible_data/apo.pdb"          # file di topologia (pdb, psf, prmtop, gro, ...)
+APO_TRAJECTORY = "/Users/lorenzosisti/hDDC_GrEVE/invisible_data/apo_nowt.xtc"  # traiettoria concatenata, gia' senza acqua
 
 # --- Sistema Holo / Closed ------------------------------------------------
-HOLO_TOPOLOGY = "holo.pdb"
-HOLO_TRAJECTORY = "holo_concat.xtc"
+HOLO_TOPOLOGY = "/Users/lorenzosisti/hDDC_GrEVE/invisible_data/holo.pdb"
+HOLO_TRAJECTORY = "/Users/lorenzosisti/hDDC_GrEVE/invisible_data/holo_nowt.xtc"
 
 # --- Parametri del grafo di contatto ---------------------------------------
 CONTACT_CUTOFF = 7.0       # Angstrom: distanza sotto la quale c'e' contatto
@@ -64,7 +64,7 @@ MIN_SEQ_SEPARATION = 0     # 0 = nessuna esclusione di vicini in sequenza
 TRAJECTORY_STEP = 1        # 1 = analizza ogni frame; aumenta per test rapidi
 
 # --- Output -----------------------------------------------------------------
-OUTPUT_DIR = "./graphs"    # cartella dove salvare i grafi .graphml / .pkl
+OUTPUT_DIR = "/Users/lorenzosisti/hDDC_GrEVE/invisible_data/graphs"    # cartella dove salvare i grafi .graphml / .pkl
 
 
 # ----------------------------------------------------------------------
