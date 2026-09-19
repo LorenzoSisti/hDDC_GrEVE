@@ -125,6 +125,13 @@ def process_and_save_networkx(
     dnap.calcGraphInfo()
     G = dnap.nxGraphs[0]  # Grafo networkx.Graph nativo generato da dynetan
 
+    # Aggiunge resid/resname come attributi dei nodi, cosi' il grafo salvato
+    # e' autosufficiente (non serve piu' l'oggetto dnap per sapere "chi e' chi").
+    resid_map = {i: int(atom.resid) for i, atom in enumerate(dnap.nodesAtmSel)}
+    resname_map = {i: atom.resname for i, atom in enumerate(dnap.nodesAtmSel)}
+    nx.set_node_attributes(G, resid_map, "resid")
+    nx.set_node_attributes(G, resname_map, "resname")
+
     # 3. Calcola e assegna gli attributi 'GC' e 'weight' = -log(GC) direttamente agli archi
     for u, v in G.edges():
         gc_val = float(gc_matrix[u, v])
