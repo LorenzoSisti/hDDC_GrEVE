@@ -1,0 +1,55 @@
+; N.B. FILE .mdp COMMENTATO CON GEMINI PRO (PER MIGLIORARE LETTURA E COMPRENSIONE)
+
+; --- PREPROCESSOR ---
+; Attiva i vincoli posizionali (Position Restraints)
+; BB = Backbone (scheletro proteina), forza 400 kJ/mol/nm^2
+; SC = Side Chains (catene laterali), forza 40 kJ/mol/nm^2
+define                  = -DPOSRES -DPOSRES_FC_BB=400.0 -DPOSRES_FC_SC=40.0
+
+; --- RUN CONTROL ---
+integrator              = md        ; Algoritmo di integrazione Leap-frog
+dt                      = 0.002     ; Time-step: 2 femtosecondi (0.002 ps) N.B. nella tesi di Adriano abbiamo usato 1 fs, ma con 2 dimezziamo le ore usate, e 2 fs sono quelli che usiamo nella production NPT
+nsteps                  = 5000000  ; Numero step per arrivare a 10 ns (5.000 ps)
+
+; --- OUTPUT CONTROL ---
+nstxout-compressed      = 5000      ; Salva traiettoria (.xtc) ogni 5 ps
+nstxout                 = 0         ; Disattiva output coordinate ad alta precisione (.trr)
+nstvout                 = 0         ; Disattiva salvataggio velocità
+nstfout                 = 0         ; Disattiva salvataggio forze
+nstcalcenergy           = 100       ; Calcola le energie ogni 100 step
+nstenergy               = 1000      ; Scrive le energie nel file .edr ogni 1 ps
+nstlog                  = 1000      ; Scrive lo stato nel file .log ogni 1 ps
+
+; --- NEIGHBOR SEARCHING  ---
+cutoff-scheme           = Verlet    ; Obbligatorio per accelerazione GPU
+nstlist                 = 20        ; Frequenza aggiornamento lista vicini (ottimale 20-40 su GPU)
+rlist                   = 1.2       ; Cut-off per la lista dei vicini (nm)
+
+; --- ELECTROSTATICS & VDW ---
+coulombtype             = PME       ; Particle Mesh Ewald per interazioni elettrostatiche long-range
+rcoulomb                = 1.2       ; Distanza cut-off elettrostatico (nm)
+vdwtype                 = Cut-off   ; Gestione Van der Waals
+vdw-modifier            = Force-switch ; Applica lo switch per smussare il potenziale vdW
+rvdw_switch             = 1.0       ; Inizio della funzione di switch (nm)
+rvdw                    = 1.2       ; Fine del cut-off Van der Waals (nm)
+
+; --- TEMPERATURE COUPLING (Ensemble NVT) ---
+tcoupl                  = v-rescale ; Termostato di Bussi-Donadio-Parrinello (corretto e stabile)
+tc-grps                 = SOLU SOLV ; Gruppi da termostatare separatamente (Soluto e Solvente)
+tau_t                   = 1.0 1.0   ; Costante di tempo per l'accoppiamento termico (ps)
+ref_t                   = 300 300   ; Temperatura di riferimento (K) per i due gruppi
+
+; --- CONSTRAINTS ---
+constraints             = h-bonds   ; Vincola i legami che coinvolgono l'idrogeno
+constraint_algorithm    = LINCS     ; Algoritmo standard per i vincoli
+
+; --- CENTER OF MASS MOTION REMOVAL ---
+; Previene l'effetto "flying ice cube" e deriva globale del sistema
+nstcomm                 = 100       ; Frequenza rimozione moto centro di massa
+comm_mode               = linear    ; Rimuove solo la traslazione
+comm-grps               = SOLU SOLV ; Gruppi su cui calcolare il centro di massa
+
+; --- VELOCITY GENERATION ---
+gen-vel                 = yes       ; Genera velocità casuali alla partenza
+gen-temp                = 300       ; Genera velocità coerenti con 300 K
+gen-seed                = -1        ; Seme casuale (basato sull'ID del processo)

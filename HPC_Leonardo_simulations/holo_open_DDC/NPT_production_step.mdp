@@ -1,0 +1,51 @@
+; N.B. FILE .mdp COMMENTATO CON GEMINI PRO PER MIGLIORARE LETTURA E COMPRENSIONE
+
+; --- RUN CONTROL ---
+integrator              = md          ; Algoritmo Leap-frog per integrare le equazioni del moto
+dt                      = 0.002       ; Time-step di 2 femtosecondi (0.002 ps) - Standard per h-bonds
+nsteps                  = 500000000   ; Totale: 1.000.000 ps = 1 microsecondo (1000 ns)
+
+; --- OUTPUT CONTROL ---
+nstxout-compressed      = 500000      ; Salva le coordinate ogni 1 ns (file .xtc leggero)
+nstxout                 = 0           ; Non salva coordinate .trr (pesanti)
+nstvout                 = 0           ; Non salva le velocità
+nstfout                 = 0           ; Non salva le forze
+nstcalcenergy           = 100         ; Calcola i dati energetici ogni 100 step
+nstenergy               = 1000        ; Scrive le energie nel file .edr ogni 2 ps
+nstlog                  = 1000        ; Aggiorna il file .log ogni 2 ps
+
+; --- NEIGHBOR SEARCHING (GPU Optimized) ---
+cutoff-scheme           = Verlet      ; Obbligatorio per accelerazione su GPU Leonardo
+nstlist                 = 20          ; Aggiornamento lista vicini (ottimo per performance)
+rlist                   = 1.2         ; Cut-off per la lista dei vicini (nm)
+
+; --- ELECTROSTATICS & VDW ---
+coulombtype             = PME         ; Metodo PME per elettrostatica a lungo raggio
+rcoulomb                = 1.2         ; Cut-off elettrostatico (nm)
+vdwtype                 = Cut-off     ; Gestione Van der Waals
+vdw-modifier            = Force-switch ; Smussa il potenziale vdW tra rvdw_switch e rvdw
+rvdw_switch             = 1.0         ; Inizio dello switch vdW
+rvdw                    = 1.2         ; Cut-off Van der Waals finale
+
+; --- TEMPERATURE COUPLING ---
+tcoupl                  = v-rescale   ; Termostato di Bussi-Donadio-Parrinello (stabile e canonico)
+tc_grps                 = SOLU SOLV   ; Accoppiamento termico separato per soluto e solvente
+tau_t                   = 1.0 1.0     ; Costante di accoppiamento termico (ps)
+ref_t                   = 300 300     ; Temperatura target (300 Kelvin)
+
+; --- PRESSURE COUPLING (Ensemble NPT) ---
+pcoupl                  = C-rescale   ; Barostato stocastico (versione moderna del Berendsen)
+pcoupltype              = isotropic   ; La pressione agisce equamente in tutte le direzioni (box cubico/rombico)
+tau_p                   = 5.0         ; Costante di tempo per il barostato (ps)
+compressibility         = 4.5e-5      ; Comprimibilità dell'acqua (bar^-1)
+ref_p                   = 1.0         ; Pressione target (1.0 bar, circa 1 atmosfera)
+
+; --- CONSTRAINTS ---
+constraints             = h-bonds     ; Vincola i legami con Idrogeno (permette dt = 2 fs)
+constraint_algorithm    = LINCS       ; Algoritmo LINCS per i vincoli
+continuation            = yes         ; Non genera nuove velocità, prosegue da equilibratura
+
+; --- COM MOTION REMOVAL ---
+nstcomm                 = 100         ; Rimuove il moto del centro di massa ogni 100 step
+comm_mode               = linear      ; Rimuove la traslazione globale
+comm_grps               = SOLU SOLV   ; Calcola il moto sui gruppi soluto e solvente
