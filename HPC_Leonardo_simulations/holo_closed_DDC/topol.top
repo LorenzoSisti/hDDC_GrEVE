@@ -1,0 +1,49 @@
+;
+;	File 'topol.top' was generated
+;	By user: sgiordan (126832)
+;	On host: login01.leonardo.local
+;	At date: Thu Jun 11 13:28:42 2026
+;
+;	This is a standalone topology file
+;
+;	Created by:
+;	                    :-) GROMACS - gmx pdb2gmx, 2024.2 (-:
+;	
+;	Executable:   /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-12.2.0/gromacs-2024.2-p7xvmbzdvw2jonqncf3sswoaeuyovvja/bin/gmx
+;	Data prefix:  /leonardo/prod/spack/06/install/0.22/linux-rhel8-icelake/gcc-12.2.0/gromacs-2024.2-p7xvmbzdvw2jonqncf3sswoaeuyovvja
+;	Working dir:  /leonardo_scratch/large/userexternal/sgiordan/DOPA_2026_PLP/Run3_sara_holo_closed
+;	Command line:
+;	  gmx pdb2gmx -f closed_holo_DDC_buono_finale_rinominato_clean.pdb -o new.gro -i new.itp -p topol.top -n index.ndx -q new.pdb -ff amber99sbneww3 -water tip3p
+;	Force field was read from current directory or a relative path - path added.
+;
+
+; Include forcefield parameters
+#include "./amber99sbneww3.ff/forcefield.itp"
+
+; Include chain topologies
+#include "topol_Protein_chain_A.itp"
+#include "topol_Protein_chain_B.itp"
+
+; Include water topology
+#include "./amber99sbneww3.ff/tip3p.itp"
+
+#ifdef POSRES_WATER
+; Position restraint for each water oxygen
+[ position_restraints ]
+;  i funct       fcx        fcy        fcz
+   1    1       1000       1000       1000
+#endif
+
+; Include topology for ions
+#include "./amber99sbneww3.ff/ions.itp"
+
+[ system ]
+; Name
+Protein in water
+
+[ molecules ]
+; Compound        #mols
+Protein_chain_A     1
+Protein_chain_B     1
+SOL         46801
+NA               8
